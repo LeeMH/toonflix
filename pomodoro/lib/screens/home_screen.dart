@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,14 +9,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int totalSecond = 1500;
+  static const int twentyfiveMinutes = 1500;
+  int totalSecond = twentyfiveMinutes;
   bool isRunning = false;
+  int pomodoros = 0;
   late Timer timer;
 
   void onTick(Timer timer) {
-    setState(() {
-      totalSecond--;
-    });
+    if (totalSecond == 0) {
+      timer.cancel();
+      setState(() {
+        isRunning = false;
+        totalSecond = twentyfiveMinutes;
+        pomodoros++;
+      });
+    } else {
+      setState(() {
+        totalSecond--;
+      });
+    }
   }
 
   void onStartPressed() {
@@ -35,6 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String format(int seconds) {
+    var duration = Duration(seconds: seconds);
+    return duration.toString().substring(2, 7);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                '$totalSecond',
+                format(totalSecond),
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 80,
@@ -95,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .color),
                         ),
                         Text(
-                          '0',
+                          '$pomodoros',
                           style: TextStyle(
                               fontSize: 50,
                               fontWeight: FontWeight.w600,
